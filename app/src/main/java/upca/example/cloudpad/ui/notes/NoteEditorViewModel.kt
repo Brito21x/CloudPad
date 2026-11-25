@@ -43,11 +43,13 @@ class NoteEditorViewModel : ViewModel() {
     private var autoSaveJob: Job? = null
 
     fun initializeNote(noteId: String?) {
-        val currentUser = auth.currentUser ?: return
+        val currentUserId = auth.currentUser?.uid ?: return
 
         if (noteId == null || noteId == "new" || noteId.isEmpty()) {
-            // Nova nota: gera um ID de documento imediatamente para poder salvar de forma transparente
-            val newId = db.collection("notes").document().id
+            val newId = db.collection("users")
+                .document(currentUserId)
+                .collection("notes")
+                .document().id
             _uiState.update {
                 it.copy(
                     noteId = newId,
@@ -57,9 +59,12 @@ class NoteEditorViewModel : ViewModel() {
                 )
             }
         } else {
-            // Carregar nota existente
             _uiState.update { it.copy(noteId = noteId, isLoading = true) }
-            db.collection("notes").document(noteId).get()
+            db.collection("users")
+                .document(currentUserId)
+                .collection("notes")
+                .document(noteId)
+                .get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         val note = document.toObject(Note::class.java)
@@ -102,17 +107,15 @@ class NoteEditorViewModel : ViewModel() {
         val title = _uiState.value.title
         val content = _uiState.value.content
 
-        // Só salva se houver algum texto escrito
         if (title.isBlank() && content.isBlank()) {
             return
         }
 
         _uiState.update { it.copy(saveStatus = AutoSaveStatus.SAVING) }
 
-        // Cancela o debounce anterior se o utilizador continuar a teclar
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch {
-            delay(500) // Debounce de meio segundo enquanto escreve
+            delay(500)
 
             val noteData = hashMapOf(
                 "id" to currentNoteId,
@@ -122,7 +125,9 @@ class NoteEditorViewModel : ViewModel() {
                 "updatedAt" to FieldValue.serverTimestamp()
             )
 
-            db.collection("notes")
+            db.collection("users")
+                .document(currentUserId)
+                .collection("notes")
                 .document(currentNoteId)
                 .set(noteData, SetOptions.merge())
                 .addOnSuccessListener {

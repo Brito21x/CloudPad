@@ -129,7 +129,6 @@ fun NoteEditorContent(
                 .padding(innerPadding)
                 .padding(horizontal = 20.dp, vertical = 10.dp)
         ) {
-            // Campo de Título
             TextField(
                 value = uiState.title,
                 onValueChange = onTitleChange,
@@ -159,7 +158,6 @@ fun NoteEditorContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Campo de Conteúdo (Nota)
             TextField(
                 value = uiState.content,
                 onValueChange = onContentChange,

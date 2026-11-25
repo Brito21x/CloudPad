@@ -118,7 +118,6 @@ fun AuthScreen(
                 .requestEmail()
                 .build()
             val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            // Desconectar antes para permitir escolher a conta novamente
             googleSignInClient.signOut().addOnCompleteListener {
                 googleSignInLauncher.launch(googleSignInClient.signInIntent)
             }
@@ -152,7 +151,6 @@ fun AuthContent(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Logótipo oficial da CloudPad
             Image(
                 painter = painterResource(id = R.drawable.cloudpad_logo),
                 contentDescription = "CloudPad Logo",
@@ -169,7 +167,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Campo de Email
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = onEmailChange,
@@ -188,7 +185,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo de Senha com Botão de Ver/Ocultar
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = onPasswordChange,
@@ -218,7 +214,6 @@ fun AuthContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Mensagem de Erro
             if (uiState.errorMessage != null) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -232,7 +227,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botão Principal (Entrar / Criar Conta)
             Button(
                 onClick = onSubmit,
                 enabled = !uiState.isLoading,
@@ -258,7 +252,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Divisor OU
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -275,7 +268,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Botão Entrar com a Google
             OutlinedButton(
                 onClick = onGoogleSignInClick,
                 enabled = !uiState.isLoading,
@@ -305,7 +297,6 @@ fun AuthContent(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Texto em baixo para alternar entre Login e Registo
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,

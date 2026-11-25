@@ -35,8 +35,9 @@ class NoteListViewModel : ViewModel() {
         val currentUser = auth.currentUser ?: return
         _uiState.update { it.copy(isLoading = true) }
 
-        db.collection("notes")
-            .whereEqualTo("userId", currentUser.uid)
+        db.collection("users")
+            .document(currentUser.uid)
+            .collection("notes")
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("CloudPad", "Erro ao carregar notas", e)
@@ -52,7 +53,6 @@ class NoteListViewModel : ViewModel() {
                         notesList.add(note)
                     }
                 }
-                // Ordenar por data de atualização mais recente
                 notesList.sortByDescending { it.updatedAt?.toDate() }
 
                 _uiState.update {
@@ -66,7 +66,12 @@ class NoteListViewModel : ViewModel() {
     }
 
     fun deleteNote(noteId: String) {
-        db.collection("notes").document(noteId).delete()
+        val currentUser = auth.currentUser ?: return
+        db.collection("users")
+            .document(currentUser.uid)
+            .collection("notes")
+            .document(noteId)
+            .delete()
     }
 
     fun signOut(onSignedOut: () -> Unit) {
