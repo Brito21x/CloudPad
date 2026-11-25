@@ -1,4 +1,4 @@
-package upca.example.cloudpad.ui.notes
+package upca.example.cloudpad.ui.screens.noteEdit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

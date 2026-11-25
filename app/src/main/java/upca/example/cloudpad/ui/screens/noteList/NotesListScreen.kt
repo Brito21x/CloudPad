@@ -1,4 +1,4 @@
-package upca.example.cloudpad.ui.notes
+package upca.example.cloudpad.ui.screens.noteList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -114,11 +114,14 @@ app/src/main/java/upca/example/cloudpad/
 │   │   ├── AuthScreen.kt         # Ecrã de Login e Registo (com Google Sign-In)
 │   │   └── AuthViewModel.kt      # Lógica de autenticação com Firebase Auth
 │   │
-│   ├── notes/
-│   │   ├── NotesListScreen.kt    # Ecrã de listagem das notas do utilizador
-│   │   ├── NoteListViewModel.kt  # Listener em tempo real (addSnapshotListener) na subcoleção
-│   │   ├── NoteEditorScreen.kt   # Ecrã de escrita com Auto-Save
-│   │   └── NoteEditorViewModel.kt# ViewModel com auto-save debounce na subcoleção do utilizador
+│   ├── screens/
+│   │   ├── noteList/
+│   │   │   ├── NotesListScreen.kt    # Ecrã de listagem das notas do utilizador
+│   │   │   └── NoteListViewModel.kt  # Listener em tempo real (addSnapshotListener) na subcoleção
+│   │   │
+│   │   └── noteEdit/
+│   │       ├── NoteEditorScreen.kt   # Ecrã de escrita com Auto-Save
+│   │       └── NoteEditorViewModel.kt# ViewModel com auto-save debounce na subcoleção do utilizador
 │   │
 │   ├── components/
 │   │   ├── MyTopBar.kt           # Barra superior reutilizável com status de auto-save

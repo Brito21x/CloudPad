@@ -1,4 +1,4 @@
-package upca.example.cloudpad.ui.notes
+package upca.example.cloudpad.ui.screens.noteList
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

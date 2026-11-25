@@ -16,8 +16,8 @@ import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import upca.example.cloudpad.ui.auth.AuthScreen
-import upca.example.cloudpad.ui.notes.NoteEditorScreen
-import upca.example.cloudpad.ui.notes.NotesListScreen
+import upca.example.cloudpad.ui.screens.noteEdit.NoteEditorScreen
+import upca.example.cloudpad.ui.screens.noteList.NotesListScreen
 import upca.example.cloudpad.ui.theme.CloudPadTheme
 
 sealed class Screen(val route: String) {
