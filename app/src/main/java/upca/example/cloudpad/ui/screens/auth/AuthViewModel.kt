@@ -1,4 +1,4 @@
-package upca.example.cloudpad.ui.auth
+package upca.example.cloudpad.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase

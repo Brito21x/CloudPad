@@ -1,4 +1,4 @@
-package upca.example.cloudpad.ui.auth
+package upca.example.cloudpad.ui.screens.auth
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
