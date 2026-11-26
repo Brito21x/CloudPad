@@ -1,51 +1,71 @@
-<p align="center">
-  <img src="cloudpad_logo.png" alt="CloudPad Logo" width="160"/>
-</p>
+<div align="center">
 
-<h1 align="center">CloudPad</h1>
+<img src="cloudpad_logo.png" alt="CloudPad Logo" width="160" />
 
-<p align="center">
-  <b>Sistema de Gestão de Notas em Tempo Real para Plataforma Android</b><br>
-  Construído com Kotlin, Jetpack Compose, Arquitetura MVVM e Firebase (BaaS)
-</p>
+# CloudPad
+
+### Real-Time Note Management System for Android
+
+> A native Android application built with **Kotlin**, **Jetpack Compose**, **MVVM**, and **Firebase (BaaS)** — delivering multi-provider authentication, real-time cloud synchronization, and debounced auto-save.
+
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)](https://developer.android.com/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-Coroutines_%26_Flow-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth_%26_Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Architecture](https://img.shields.io/badge/Architecture-MVVM_%2B_UDF-181717?style=flat-square)](https://developer.android.com/topic/architecture)
+
+</div>
 
 ---
 
-## 1. Visão Geral
+## Table of Contents
 
-O **CloudPad** é uma aplicação móvel nativa desenvolvida para a plataforma Android com foco em sincronização distribuída, persistência na nuvem em tempo real e experiência de utilizador reativa. O sistema adota o paradigma **Backend-as-a-Service (BaaS)** através do ecossistema Google Firebase, suportando autenticação com múltiplos fornecedores e modelação hierárquica NoSQL com Cloud Firestore.
+- [Overview](#overview)
+- [Firebase BaaS Implementation](#firebase-baas-implementation)
+- [Data Modeling Architecture (Cloud Firestore)](#data-modeling-architecture-cloud-firestore)
+- [Key Features](#key-features)
+- [Software Architecture](#software-architecture)
+- [Project Structure](#project-structure)
+- [Setup and Installation](#setup-and-installation)
+- [Author](#author)
 
 ---
 
-## 2. Conformidade com os Requisitos Técnicos (Firebase BaaS)
+## Overview
 
-A solução foi estruturada para cumprir integralmente as normas e especificações técnicas de integração com Firebase em aplicações Android:
+**CloudPad** is a native Android application focused on distributed synchronization, real-time cloud persistence, and a reactive user experience. Built on the **Backend-as-a-Service (BaaS)** paradigm through the Google Firebase ecosystem, it supports multi-provider authentication and hierarchical NoSQL data modeling with Cloud Firestore.
 
-| Requisito Técnico | Detalhes de Implementação no CloudPad |
+---
+
+## Firebase BaaS Implementation
+
+The application is engineered to meet core technical standards for integrating Firebase into modern Android applications:
+
+| Technical Requirement | CloudPad Implementation Details |
 | :--- | :--- |
-| **Configuração do Projeto** | Integração de `google-services.json` no módulo `:app`, utilização do Firebase Bill of Materials (`firebase-bom`) e aplicação do plugin `com.google.gms.google-services`. |
-| **Autenticação de Utilizadores** | Firebase Authentication via Email/Password e Google Sign-In; gestão de sessão autenticada e extração do identificador de utilizador através de `currentUser?.uid`. |
-| **Modelação Cloud Firestore** | Modelação hierárquica baseada em **Coleções**, **Documentos** e **Subcoleções** (`users/{userId}/notes/{noteId}`). |
-| **Operações de Leitura e Escrita** | Fluxo CRUD completo: criação de notas, listagem reativa, atualização pontual de campos com mecanismo de *debounce* de 500ms e eliminação de registos. |
-| **Sincronização em Tempo Real** | Utilização de `addSnapshotListener` acoplado à subcoleção do utilizador, sincronizando instantaneamente o estado da UI entre múltiplos dispositivos. |
-| **Associação de Dados por UID** | Atribuição do campo `userId` a cada documento e isolamento físico das notas na subcoleção associada ao `currentUser.uid`. |
+| **Project Configuration** | Integrates `google-services.json` in the `:app` module, manages library versions via the Firebase Bill of Materials (`firebase-bom`), and applies the `com.google.gms.google-services` Gradle plugin. |
+| **User Authentication** | Implements Firebase Authentication with Email/Password and Google Sign-In, manages authenticated session state, and resolves user identity via `currentUser?.uid`. |
+| **Cloud Firestore Modeling** | Uses a hierarchical NoSQL structure built on **Collections**, **Documents**, and **Subcollections** (`users/{userId}/notes/{noteId}`). |
+| **Read & Write Operations** | Full CRUD lifecycle: note creation, reactive grid listing, incremental field updates with a 500ms *debounce* mechanism, and record deletion. |
+| **Real-Time Synchronization** | Attaches `addSnapshotListener` to the user's subcollection to synchronize UI state instantaneously across multiple devices. |
+| **UID-Scoped Data Isolation** | Stores the owner's `userId` on every document and physically isolates notes within the subcollection bound to `currentUser.uid`. |
 
 ---
 
-## 3. Arquitetura de Modelação de Dados (Cloud Firestore)
+## Data Modeling Architecture (Cloud Firestore)
 
-A arquitetura de persistência baseia-se numa estrutura hierárquica de subcoleções NoSQL, garantindo integridade referencial, isolamento multi-inquilino (*multi-tenant*) e escalabilidade operacional.
+The persistence layer uses a hierarchical NoSQL subcollection structure to ensure referential integrity, strict multi-tenant isolation, and operational scalability.
 
-### 3.1. Hierarquia de Dados
+### Data Hierarchy
 
 ```text
-[Coleção] users
+[Collection] users
    │
-   └── [Documento] {userId}
+   └── [Document] {userId}
           │
-          └── [Subcoleção] notes
+          └── [Subcollection] notes
                  │
-                 └── [Documento] {noteId}
+                 └── [Document] {noteId}
                         ├── id: String
                         ├── userId: String
                         ├── title: String
@@ -53,19 +73,19 @@ A arquitetura de persistência baseia-se numa estrutura hierárquica de subcole�
                         └── updatedAt: Timestamp
 ```
 
-### 3.2. Dicionário de Dados do Documento (`Note`)
+### Document Data Dictionary (`Note`)
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| `id` | `String` | Identificador único alfanumérico gerado pelo Firestore para o documento. |
-| `userId` | `String` | UID do utilizador proprietário autenticado via Firebase Auth. |
-| `title` | `String` | Título da nota atribuído pelo utilizador. |
-| `content` | `String` | Corpo textual e conteúdo integral da nota. |
-| `updatedAt` | `Timestamp` | Carimbo de data/hora no servidor (`FieldValue.serverTimestamp()`) para ordenação temporal. |
+| `id` | `String` | Unique alphanumeric document identifier generated by Firestore. |
+| `userId` | `String` | Owner's UID authenticated via Firebase Auth. |
+| `title` | `String` | User-defined note title. |
+| `content` | `String` | Full body text of the note. |
+| `updatedAt` | `Timestamp` | Server-side timestamp (`FieldValue.serverTimestamp()`) used for chronological sorting. |
 
-### 3.3. Regras de Segurança e Controlo de Acesso
+### Security Rules and Access Control
 
-A estrutura em subcoleção permite restringir o acesso diretamente pelo caminho do documento, assegurando que nenhum utilizador consegue ler ou modificar dados pertencentes a terceiros:
+The subcollection layout enables path-based authorization directly in Firestore Security Rules, ensuring no user can read or modify another user's data:
 
 ```javascript
 rules_version = '2';
@@ -80,104 +100,136 @@ service cloud.firestore {
 
 ---
 
-## 4. Funcionalidades Principais
+## Key Features
 
-### Autenticação e Controlo de Acesso
-* Registo e início de sessão com Email e Palavra-passe através do Firebase Auth.
-* Suporte nativo para autenticação federada com Google Sign-In.
-* Validação de campos no cliente (formato de email e requisitos mínimos de palavra-passe).
-* Mapeamento completo de códigos de exceção do Firebase para mensagens amigáveis em português.
-* Navegação reativa condicionada pelo estado de autenticação (`currentUser != null`).
+### Authentication and Access Control
+- Email/Password registration and sign-in powered by Firebase Auth.
+- Native federated authentication via Google Sign-In.
+- Client-side input validation for email formatting and minimum password requirements.
+- Complete mapping of Firebase exception codes into clear, user-friendly error messages.
+- Reactive navigation driven directly by authentication state (`currentUser != null`).
 
-### Gestão e Sincronização de Notas
-* Consulta contínua à subcoleção via `addSnapshotListener`, refletindo alterações em tempo real na interface sem necessidade de atualização manual (*pull-to-refresh*).
-* Ordenação dinâmica das notas por ordem cronológica decrescente da última modificação.
-* Eliminação de notas com atualização reativa e imediata da grelha.
+### Note Management and Real-Time Sync
+- Continuous observation of the user's subcollection via `addSnapshotListener`, reflecting changes in real time without manual refresh (*pull-to-refresh*).
+- Dynamic sorting of notes in descending chronological order by last modification timestamp.
+- Immediate, reactive grid updates upon note deletion.
 
-### Mecanismo de Gravação Automática com Debounce
-* Deteção contínua de alterações nos campos de texto do editor.
-* Cancelamento e reescalonamento da rotina de gravação via Kotlin Coroutines com atraso de 500ms (*debounce*).
-* Persistência na Cloud Firestore através do método `set` com a opção `SetOptions.merge()`, reduzindo acessos redundantes à rede.
-* Notificação visual de estado na barra de navegação (`A guardar...`, `Guardado na nuvem`).
-
----
-
-## 5. Arquitetura de Software
-
-O projeto adota os princípios de arquitetura recomendados pela Google para desenvolvimento moderno em Android:
-
-* **Padrão de Apresentação:** Model-View-ViewModel (MVVM).
-* **Gestão de Estado:** Unidirectional Data Flow (UDF) com `StateFlow` e `MutableStateFlow`.
-* **Programação Concorrente:** Kotlin Coroutines (`viewModelScope`) para tarefas assíncronas em segundo plano.
-* **Interface Gráfica:** 100% declarativa em Jetpack Compose com Material Design 3.
-* **Navegação:** Navigation Compose com tipagem de rotas e argumentos.
+### Debounced Auto-Save Mechanism
+- Continuous observation of text changes in the note editor.
+- Automatic cancellation and rescheduling of save jobs via Kotlin Coroutines using a 500ms *debounce* window.
+- Efficient persistence to Cloud Firestore using `set` with `SetOptions.merge()`, minimizing redundant network writes.
+- Real-time visual sync indicator in the top app bar (e.g., *Saving...*, *Saved to cloud*).
 
 ---
 
-## 6. Estrutura do Código-Fonte
+## Software Architecture
+
+CloudPad follows Google's recommended modern Android architecture guidelines:
+
+```text
+╔══════════════════════════════════════════════════════════════════╗
+║                    UI LAYER — Jetpack Compose                    ║
+║        AuthScreen · NotesListScreen · NoteEditorScreen           ║
+║             MyTopBar · NoteCard · Navigation Compose             ║
+╚════════════════════════════════╤═════════════════════════════════╝
+                                 │  UI Events · StateFlow
+╔════════════════════════════════▼═════════════════════════════════╗
+║                PRESENTATION LAYER — MVVM & UDF                   ║
+║     AuthViewModel · NoteListViewModel · NoteEditorViewModel      ║
+║        Kotlin Coroutines (viewModelScope) · 500ms Debounce       ║
+╚════════════════════════════════╤═════════════════════════════════╝
+                                 │  Firebase Android SDK
+╔════════════════════════════════▼═════════════════════════════════╗
+║                   CLOUD LAYER — Firebase BaaS                    ║
+║   Firebase Authentication (Email & Google) · Cloud Firestore     ║
+║      Real-Time Snapshot Listeners · UID-Scoped Security Rules    ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+- **Presentation Pattern:** Model-View-ViewModel (MVVM).
+- **State Management:** Unidirectional Data Flow (UDF) with `StateFlow` and `MutableStateFlow`.
+- **Concurrency:** Kotlin Coroutines (`viewModelScope`) for background asynchronous operations and debounced saves.
+- **UI Toolkit:** 100% declarative Jetpack Compose with Material Design 3 (Light and Dark themes).
+- **Navigation:** Navigation Compose with typed routes and arguments.
+
+---
+
+## Project Structure
 
 ```text
 app/src/main/java/upca/example/cloudpad/
 │
-├── MainActivity.kt                      # Ponto de entrada, controlo de sessão e rotas
+├── MainActivity.kt                      # Entry point, session state handling, and navigation routes
 │
 ├── models/
-│   └── Note.kt                          # Entidade de dados da nota
+│   └── Note.kt                          # Note data model
 │
 ├── ui/
 │   ├── screens/
 │   │   ├── auth/
-│   │   │   ├── AuthScreen.kt            # Interface de autenticação (Email e Google)
-│   │   │   └── AuthViewModel.kt         # Lógica de negócio de autenticação
+│   │   │   ├── AuthScreen.kt            # Authentication UI (Email/Password & Google Sign-In)
+│   │   │   └── AuthViewModel.kt         # Authentication business logic
 │   │   │
 │   │   ├── noteList/
-│   │   │   ├── NotesListScreen.kt       # Interface de listagem em grelha
-│   │   │   └── NoteListViewModel.kt     # Listener em tempo real da subcoleção
+│   │   │   ├── NotesListScreen.kt       # Grid-based notes listing UI
+│   │   │   └── NoteListViewModel.kt     # Real-time subcollection snapshot listener
 │   │   │
 │   │   └── noteEdit/
-│   │       ├── NoteEditorScreen.kt      # Interface do editor com auto-save
-│   │       └── NoteEditorViewModel.kt   # Lógica de gravação com debounce
+│   │       ├── NoteEditorScreen.kt      # Note editor UI with live auto-save status
+│   │       └── NoteEditorViewModel.kt   # Debounced persistence logic
 │   │
 │   ├── components/
-│   │   ├── MyTopBar.kt                  # Barra superior modular com estado de gravação
-│   │   └── NoteCard.kt                  # Componente de cartão para exibição na grelha
+│   │   ├── MyTopBar.kt                  # Modular top bar with live sync status indicator
+│   │   └── NoteCard.kt                  # Reusable grid card component
 │   │
 │   └── theme/
-│       ├── Color.kt                     # Paleta de cores do sistema
-│       ├── Theme.kt                     # Configuração do tema Material 3 (Claro/Escuro)
-│       └── Type.kt                      # Tipografia do sistema
+│       ├── Color.kt                     # Application color palette
+│       ├── Theme.kt                     # Material 3 Light/Dark theme configuration
+│       └── Type.kt                      # Typography scale
 ```
 
 ---
 
-## 7. Instruções de Configuração e Instalação
+## Setup and Installation
 
-### 7.1. Pré-requisitos
-* Android Studio (versão Ladybug, Iguana ou superior recomendada).
-* JDK 17 ou superior configurado.
-* Dispositivo físico Android com modo de depuração ativado ou Emulador com Google Play Services (API 24 ou superior).
+### Prerequisites
 
-### 7.2. Configuração do Firebase
-1. Crie um projeto na [Consola do Firebase](https://console.firebase.google.com/).
-2. Registe uma aplicação Android com o nome de pacote:
+- Android Studio (Ladybug, Iguana, or later recommended).
+- JDK 17 or higher.
+- Physical Android device with USB debugging enabled, or an Emulator with Google Play Services (API 24 or higher).
+
+### Firebase Configuration
+
+1. Create a new project in the [Firebase Console](https://console.firebase.google.com/).
+2. Register an Android app with the package name:
    ```text
    upca.example.cloudpad
    ```
-3. Obtenha a impressão digital SHA-1 do ambiente de desenvolvimento executando o comando:
+3. Generate your development SHA-1 fingerprint by running:
    ```bash
    ./gradlew signingReport
    ```
-4. Adicione a chave SHA-1 nas definições da aplicação na Consola do Firebase.
-5. Ative os métodos de início de sessão em **Authentication**:
-   * E-mail/Palavra-passe
-   * Google
-6. Inicialize a base de dados em **Cloud Firestore** e aplique as regras de segurança descritas na secção 3.3.
-7. Descarregue o ficheiro de configuração `google-services.json` e coloque-o no diretório:
+4. Add the SHA-1 fingerprint to your Android app settings in the Firebase Console.
+5. Enable the following sign-in providers under **Authentication**:
+   - Email/Password
+   - Google
+6. Initialize **Cloud Firestore** and deploy the security rules defined in the [Security Rules and Access Control](#security-rules-and-access-control) section.
+7. Download the `google-services.json` configuration file and place it in:
    ```text
    CloudPad/app/google-services.json
    ```
 
-### 7.3. Compilação e Execução
-1. Abra o diretório do projeto no Android Studio.
-2. Execute a sincronização dos ficheiros de construção através do botão **Sync Project with Gradle Files**.
-3. Selecione o dispositivo de destino e inicie a execução através da opção **Run** (`Shift + F10`).
+### Build and Run
+
+1. Open the project directory in Android Studio.
+2. Click **Sync Project with Gradle Files** to resolve dependencies.
+3. Select your target device or emulator and click **Run** (`Shift + F10`).
+
+---
+
+## Author
+
+**Edgar Brito** · Polytechnic University of Cávado and Ave (UPCA)  
+Computer Systems Engineering
+
+[![GitHub](https://img.shields.io/badge/GitHub-Brito21x-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Brito21x)
